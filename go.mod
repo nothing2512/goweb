@@ -4,6 +4,7 @@ go 1.21.4
 
 require (
 	github.com/joho/godotenv v1.5.1
+	google.golang.org/protobuf v1.34.1
 	gorm.io/gorm v1.25.10
 )
 
@@ -18,7 +19,6 @@ require (
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
-	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 )
 
