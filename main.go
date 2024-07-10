@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"main/controllers"
 	"main/db"
-	"main/middlewares"
+	"main/proto"
 	"net"
 	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -20,7 +21,8 @@ func main() {
 	}
 	db.Connect()
 
-	routes()
+	s := grpc.NewServer()
+	proto.RegisterExamplesServer(s, &controllers.Examples{})
 
 	host := os.Getenv("HOST") + ":" + os.Getenv("PORT")
 
@@ -29,27 +31,8 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("Listening On " + host)
+	fmt.Println("Listening Grpc On " + host)
 	if err = http.Serve(ln, nil); err != nil {
 		panic(err)
 	}
-}
-
-func routes() {
-
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("static/uploads"))))
-
-	view("/", "")
-	api("/examples", controllers.Examples)
-}
-
-func view(uri, loc string) {
-	http.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "views/"+loc)
-	})
-}
-
-func api(uri string, next http.HandlerFunc) {
-	http.HandleFunc("/api"+uri, middlewares.Cors(next))
 }
