@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"main/controllers"
+	"main/db"
 	"main/middlewares"
 	"net"
 	"net/http"
@@ -11,15 +12,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func init() {
+func main() {
+
 	err := godotenv.Load()
 	if err != nil {
 		panic(err)
 	}
-	// db.Connect()
-}
+	db.Connect()
 
-func main() {
 	routes()
 
 	host := os.Getenv("HOST") + ":" + os.Getenv("PORT")
