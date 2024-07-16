@@ -1,25 +1,12 @@
 package utils
 
 import (
-	"bytes"
-	"html/template"
 	"os"
 
 	"github.com/nothing2512/mailer"
 )
 
 func SendMail(title, target, view string, data interface{}) error {
-	t, err := template.ParseFiles(view)
-	if err != nil {
-		return err
-	}
-	var body bytes.Buffer
-	if data != nil {
-		_ = t.Execute(&body, data)
-	} else {
-		_ = t.Execute(&body, struct{}{})
-	}
-
 	m, err := mailer.Init(
 		os.Getenv("MAIL_USER"),
 		os.Getenv("MAIL_PASSWORD"),
@@ -32,7 +19,7 @@ func SendMail(title, target, view string, data interface{}) error {
 
 	m.Recipients(target)
 	m.Subject(title)
-	m.SetHTML(body.String())
+	m.SetHTMLFile(view, data)
 
 	return m.Send()
 }
