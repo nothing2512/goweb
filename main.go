@@ -1,14 +1,13 @@
 package main
 
 import (
-	"fmt"
+	"main/constants"
 	"main/controllers"
 	"main/db"
 	"main/middlewares"
-	"net"
-	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -20,36 +19,32 @@ func main() {
 	}
 	db.Connect()
 
-	routes()
+	gin.SetMode(gin.DebugMode)
+	engine := gin.Default()
+	engine.Use(middlewares.Cors())
+	routes(engine)
 
 	host := os.Getenv("HOST") + ":" + os.Getenv("PORT")
 
-	ln, err := net.Listen("tcp", host)
+	err = engine.Run(host)
 	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Listening On " + host)
-	if err = http.Serve(ln, nil); err != nil {
-		panic(err)
+		print(err)
+		return
 	}
 }
 
-func routes() {
+func routes(r *gin.Engine) {
+	r.Static("/static/", "./static/")
+	r.Static("/uploads/", "./static/uploads/")
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
-	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("static/uploads"))))
+	r.GET("/examples", controllers.Examples)
 
-	view("/", "")
-	api("/examples", controllers.Examples)
-}
-
-func view(uri, loc string) {
-	http.HandleFunc(uri, func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "views/"+loc)
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(404, gin.H{
+			"status":  false,
+			"message": "Route not found",
+			"data":    nil,
+			"code":    constants.ErrNotFound,
+		})
 	})
-}
-
-func api(uri string, next http.HandlerFunc) {
-	http.HandleFunc("/api"+uri, middlewares.Cors(next))
 }

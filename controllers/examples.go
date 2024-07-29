@@ -1,8 +1,6 @@
 package controllers
 
-import (
-	"net/http"
-)
+import "github.com/gin-gonic/gin"
 
-func Examples(w http.ResponseWriter, r *http.Request) {
+func Examples(c *gin.Context) {
 }

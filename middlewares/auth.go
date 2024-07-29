@@ -1,12 +1,12 @@
 package middlewares
 
 import (
-	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
-func Auth(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func Auth() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		// Do Auth Here
-		next.ServeHTTP(w, r)
+		c.Next()
 	}
 }
