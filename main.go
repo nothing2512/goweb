@@ -3,7 +3,6 @@ package main
 import (
 	"main/constants"
 	"main/controllers"
-	"main/db"
 	"main/middlewares"
 	"os"
 
@@ -17,7 +16,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	db.Connect()
+	// db.Connect()
 
 	gin.SetMode(gin.DebugMode)
 	engine := gin.Default()
@@ -36,8 +35,11 @@ func main() {
 func routes(r *gin.Engine) {
 	r.Static("/static/", "./static/")
 	r.Static("/uploads/", "./static/uploads/")
+	r.LoadHTMLGlob("./views/*.html")
+	r.LoadHTMLGlob("./views/**/*.html")
 
-	r.GET("/examples", controllers.Examples)
+	r.GET("/", controllers.ExampleView)
+	r.GET("/api", controllers.ExampleApi)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{
